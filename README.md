@@ -1,14 +1,25 @@
 # Object Detection in an Urban Environment
 
-# Project-Object-Detection-in-an-Urban-Environment
 Udacity Self Driving Car Engineer Nanodegree 
-Project 1: Object Detection in an Urban Environment
+Author: Shreyansh Shethia
 
-# Project Writeup Template
 ## Project overview:
+Self driving cars need to sense the environment around them to navigate the chassis and necessarily avoid any unsafe situations. 
+Object detection 
+- the movable or non-movable objects like, cars, pedestrians, buildings etc. 
+- tracking the motion of movable objects 
+-           
+This project aims to analyse the real world image data from Waymo and create a CNN model to detect certain objects in those images. The real world dataset contains images from urban enviroments with ground truth for cars, pedestrians, and cyclists already labeled. 
+Firstly an extensive data analysis (EDA) is performed including the computation of label distributions, display of sample images, and checking for object occlusions. Based on EDA, the favourable augmentations are performed. Then finally a CNN is trained to classify the objects in the images.
+Lastly, different hyperparamsters are modified to give the best result.
+
+
 This section should contain a brief description of the project and what we are trying to achieve. Why is object detection such an important component of self-driving car systems?
+
 ## Set up: 
 This section should contain a brief description of the steps to follow to run the code for this repository.
+1. Make a copy of this repository
+2. Run  '''./launch_jupyter.sh'''  
 ## Dataset
 1. Dataset Analysis: This section should contain a quantitative and qualitative description of the dataset. It should include images, charts, and other visualizations.
 2. Cross-validation: This section should detail the cross-validation strategy and justify your approach.
