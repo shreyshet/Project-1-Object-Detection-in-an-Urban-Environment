@@ -5,27 +5,93 @@ Author: Shreyansh Shethia
 
 ## Project overview:
 Self driving cars need to sense the environment around them to navigate the chassis and necessarily avoid any unsafe situations. 
-Object detection 
-- the movable or non-movable objects like, cars, pedestrians, buildings etc. 
-- tracking the motion of movable objects 
--           
-This project aims to analyse the real world image data from Waymo and create a CNN model to detect certain objects in those images. The real world dataset contains images from urban enviroments with ground truth for cars, pedestrians, and cyclists already labeled. 
-Firstly an extensive data analysis (EDA) is performed including the computation of label distributions, display of sample images, and checking for object occlusions. Based on EDA, the favourable augmentations are performed. Then finally a CNN is trained to classify the objects in the images.
-Lastly, different hyperparamsters are modified to give the best result.
+Object detection can help classify different objects in the surrounding and this information is then used track the motion of these objects. This project aims to analyse the real world image data from Waymo and create a CNN model to detect certain objects in those images. The real world dataset contains images from urban enviroments with ground truth for cars, pedestrians, and cyclists already labeled. 
+Firstly an extensive data analysis (EDA) is performed including the computation of label distributions, display of sample images, and checking for object occlusions. Based on EDA, the favourable augmentations are performed. Then a general pretrained CNN model is trained on the given dataset to classify pedestrians, cyclists and cars in the images. Further, the hyperparameters of trained model are modified to achieve the better results.
 
-
-This section should contain a brief description of the project and what we are trying to achieve. Why is object detection such an important component of self-driving car systems?
 
 ## Set up: 
-This section should contain a brief description of the steps to follow to run the code for this repository.
-1. Make a copy of this repository
-2. Run  '''./launch_jupyter.sh'''  
+A brief description of the steps to follow to run the code for this repository are presented here. For further details on the structure of repository, downloading the dataset is presented here [README](https://github.com/udacity/nd013-c1-vision-starter/blob/main/README.md).
+
+1. This project was ran on a virtual deskop where the dataset and other utility files were already downloaded and installed.
+2. For Exploratory Data Analysis and Exploring Data Augmentation,
+    - The jupyter notebook is launched in default browser using the command: 
+    
+        ```
+        jupyter notebook --port 3002 --ip=0.0.0.0 --allow-root
+        ```
+        
+    - Ran ` Exploratory Data Analysis.ipynb ` for exploring the Dataset, like displaying the image and looking the class distribution.
+    - Ran `Explore augmentations.ipynb` for experimenting with different data augmentations in the protos file. All augmentations are taken from [`\experiments\proto_file_dataaugmentations.txt`](https://github.com/shreyshet/Project-1-Object-Detection-in-an-Urban-Environment/blob/main/experiments/proto_file_dataaugmentations.txt)  
+3. For training a pretrained model on the dataset,
+    - The pretrained model [SSD Resnet 50 640x640](http://download.tensorflow.org/models/object_detection/tf2/20200711/ssd_resnet50_v1_fpn_640x640_coco17_tpu-8.tar.gz) is downloaded and moved to <path to repo>/experiments/pretrained_model/
+    - The following python script is used to edit the config files for training the model 
+    
+      ``` python edit_config.py --train_dir <path to repo>/data/train/ --eval_dir <path to repo>/data/val/ --batch_size 2 --checkpoint <path to repo>/experiments/pretrained_model/ssd_resnet50_v1_fpn_640x640_coco17_tpu-8/checkpoint/ckpt-0 --label_map  <path to repo>/experiments/label_map.pbtxt```
+      
+    - The `pipeline_new.config` is moved to `<path to repo>/experiments/reference` folder
+    - In the repository directory, the model is trained using 
+     
+     ``` python experiments/model_main_tf2.py --model_dir=experiments/reference/ --pipeline_config_path=experiments/reference/pipeline_new.config ```
+     
+    - Parallely, the training is visualized using 
+    
+    ``` python -m tensorboard.main --logdir experiments/reference/ ```
+    
+    - The model is evaluated using 
+    
+    ``` python experiments/model_main_tf2.py --model_dir=experiments/reference/ --pipeline_config_path=experiments/reference/pipeline_new.config --checkpoint_dir=experiments/reference/ ```
+    
+4. For further improvements on the model, the pipeline_new.config is modified with Data Augmentations, different learning rayes and different optimizers. These modifications are organized as 
+```
+experiments/
+    - pretrained_model/
+    - exporter_main_v2.py - to create an inference model
+    - model_main_tf2.py - to launch training
+    - reference/ - reference training with the unchanged config file
+    - experiment0/ - Experiment on different Data Augmentations (DA)
+    - experiment1/ - Experiment on DA and RMS prop with different learning rates  
+    - experiment2/ - Experiment on DA and ADAM optimizer with different learning rates
+    - label_map.pbtxt - Text file describing labels 
+    ...
+```
+  
+    Each experiment is trained similar to step 3 but in different folders, changed the ```reference``` to ```experiment0/1/2``` and config files as given in this repository.
+      
+     
+
 ## Dataset
-1. Dataset Analysis: This section should contain a quantitative and qualitative description of the dataset. It should include images, charts, and other visualizations.
-2. Cross-validation: This section should detail the cross-validation strategy and justify your approach.
+1. Dataset Analysis: This section contains a quantitative and qualitative description of the dataset using `Exploratory Data Analysis.ipynb` and `Explore augmentations.ipynb`.
+    - A few images from dataset using `display_images()` from `Exploratory Data Analysis.ipynb`
+    
+        ![display_images](https://github.com/shreyshet/Project-1-Object-Detection-in-an-Urban-Environment/blob/main/results/DA_/DA_/display_img_all_4x4.png)     
+        *Images from datasets with bounding boxes for each class: Car (red), Pedestrian (blue) and Bicycle (green)*
+    
+    - The total number of ground truth labels for each class is shown using the histogram below
+        ![class_dist](results/DA_/DA_/CDist.png)     
+        *Class distribution*
+    
+    - The location and size of bounding box distribution is also plotted for each class
+    
+        - ![loc_dist_car](results/DA_/DA_/cars_area_size_location.png)     
+        *Location and bounding box size distribution for Class = Car*
+    
+        - ![loc_dist_pedes](results/DA_/DA_/pedes_area_size_location.png)     
+        *Location and bounding box size distribution for Class = Pedestrians*
+        
+        - ![loc_dist_cyc](results/DA_/DA_/cyclists_area_size_location.png)     
+        *Location and bounding box size distribution for Class = Bicycle*
+    
+2. Cross-validation: For cross validation the dataset was already split in the remote desktop in the ratio of 
+        training: validation: test = 86: 10: 3   
 
 ## Training
-1. Reference experiment: This section should detail the results of the reference experiment. It should include training metrics, Tensorboard charts, and a detailed explanation of the algorithm's performance.
+1. Reference experiment: 
+     - This uses the off-the-shelf pretrained model [SSD Resnet 50 640x640](https://arxiv.org/pdf/1512.02325.pdf). The modified config will changes in number of classes, batch Size, a few data augmentaions and hyperparameters for momentum optimzers.
+     - the training from tensorboard is shwon below
+    ![ref_training]()
+    
+    
+     section should detail the results of the reference experiment. It should include training metrics, Tensorboard charts, and a detailed explanation of the algorithm's performance.
 2. Improve on the reference: This section should highlight the different strategies you adopted to improve your model. It should contain relevant figures and details of your findings.
 
 
@@ -66,33 +132,6 @@ experiments/
     - label_map.pbtxt
     ...
 ```
-
-## Prerequisites
-
-### Local Setup
-
-For local setup if you have your own Nvidia GPU, you can use the provided Dockerfile and requirements in the [build directory](./build).
-
-Follow [the README therein](./build/README.md) to create a docker container and install all prerequisites.
-
-### Download and process the data
-
-**Note:** ”If you are using the classroom workspace, we have already completed the steps in the section for you. You can find the downloaded and processed files within the `/home/workspace/data/preprocessed_data/` directory. Check this out then proceed to the **Exploratory Data Analysis** part.
-
-The first goal of this project is to download the data from the Waymo's Google Cloud bucket to your local machine. For this project, we only need a subset of the data provided (for example, we do not need to use the Lidar data). Therefore, we are going to download and trim immediately each file. In `download_process.py`, you can view the `create_tf_example` function, which will perform this processing. This function takes the components of a Waymo Tf record and saves them in the Tf Object Detection api format. An example of such function is described [here](https://tensorflow-object-detection-api-tutorial.readthedocs.io/en/latest/training.html#create-tensorflow-records). We are already providing the `label_map.pbtxt` file.
-
-You can run the script using the following command:
-```
-python download_process.py --data_dir {processed_file_location} --size {number of files you want to download}
-```
-
-You are downloading 100 files (unless you changed the `size` parameter) so be patient! Once the script is done, you can look inside your `data_dir` folder to see if the files have been downloaded and processed correctly.
-
-### Classroom Workspace
-
-In the classroom workspace, every library and package should already be installed in your environment. You will NOT need to make use of `gcloud` to download the images.
-
-## Instructions
 
 ### Exploratory Data Analysis
 
