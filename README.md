@@ -87,12 +87,27 @@ experiments/
 ## Training
 1. Reference experiment: 
      - This uses the off-the-shelf pretrained model [SSD Resnet 50 640x640](https://arxiv.org/pdf/1512.02325.pdf). The modified config will changes in number of classes, batch Size, a few data augmentaions and hyperparameters for momentum optimzers.
-     - the training from tensorboard is shwon below
-    ![ref_training]()
+     
+     - Learning rate 
+     ![ref_training](results/reference tb/Loss_all.png)
+     
+     - the training from tensorboard is shown below
     
+    ![ref_training](results/reference tb/train_loss_all.png)
+     
+     The classification loss represents error caused by misclassification of classes. The localization loss is caused by error between the position of bounding box from ground truth and model output. Regularization loss is caused by magnitude of model weights. total loss  
+     
+      For reference model, classification loss and localization loss are almost stuck at a this is increasing with time showing that the training is being stuck at a local minima. Further the regulization loss is showing an increasing trend, which might hint that the model is overfitted to the data.        
     
      section should detail the results of the reference experiment. It should include training metrics, Tensorboard charts, and a detailed explanation of the algorithm's performance.
-2. Improve on the reference: This section should highlight the different strategies you adopted to improve your model. It should contain relevant figures and details of your findings.
+     
+2. Experiment0: To improve performance, the multiple changes to the config file are made. This experiement consist in improving the data augmentation strategy. The [`preprocessor.proto`](https://github.com/tensorflow/models/blob/master/research/object_detection/protos/preprocessor.proto) file contains the different data augmentation method available in the Tf Object Detection API. 
+
+- These augmentations are visualized below using: `Explore augmentations.ipynb`. 
+    --   
+
+Using this notebook, try different data augmentation combinations and select the one you think is optimal for our dataset. Justify your choices in the writeup. 
+This section should highlight the different strategies you adopted to improve your model. It should contain relevant figures and details of your findings.
 
 
 ## Data
