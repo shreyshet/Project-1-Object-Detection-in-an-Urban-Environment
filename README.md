@@ -61,8 +61,10 @@ experiments/
 1. Dataset Analysis: This section contains a quantitative and qualitative description of the dataset using `Exploratory Data Analysis.ipynb` and `Explore augmentations.ipynb`.
     - A few images from dataset using `display_images()` from `Exploratory Data Analysis.ipynb`
     
-        ![display_images](https://github.com/shreyshet/Project-1-Object-Detection-in-an-Urban-Environment/blob/main/results/DA_/DA_/display_img_all_4x4.png)     
+        ![display_images](https://github.com/shreyshet/Project-1-Object-Detection-in-an-Urban-Environment/blob/main/results/DA_/DA_/display_img_all_8x8.png)     
         *Images from datasets with bounding boxes for each class: Car (red), Pedestrian (blue) and Bicycle (green)*
+        
+        Some images have good lighting condition, objects are easy to identify using naked eye. Others are under rainy day, night condition and at a different angle than front.   
     
     - The total number of ground truth labels for each class is shown using the histogram below
         ![class_dist](results/DA_/DA_/CDist.png)     
